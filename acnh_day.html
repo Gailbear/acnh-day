@@ -1,0 +1,185 @@
+<html>
+<head>
+<style type="text/css">
+.green {
+  background: green;
+}
+.red {
+  background: red;
+}
+#source {
+  display: none;
+}
+#tp {
+  width: 30px;
+}
+td[colspan=3] {
+  width: 45px;
+}
+td#vis {
+  text-align: left;
+  padding-left: 20px;
+}
+td {
+  width: 15px;
+  height: 15px;
+  text-align: center;
+}
+#visin {
+  width: 100px;
+}
+</style>
+</head>
+<body>
+<div id="target"></div>
+<div id="source">
+mixin td_toggle(row, key, val)
+  td(class={red: !(val.value), green: val.value}, onclick="toggle("+row+",\""+key+"\")")= val.name
+table
+  tr
+    td(colspan=3)= day
+    each val, key in rows[0]
+      +td_toggle(0, key, val)
+  each r in [1,2,3]
+    tr
+      each val, key in rows[r]
+        +td_toggle(r, key, val)
+  tr
+    td TP
+    td(colspan=2)
+      input#tp(type='text', size=3, onchange="set_tp()", value=turnips)
+    td G
+    td A
+    td D
+    each val, key in rows[4]
+      +td_toggle(4, key, val)
+  tr
+    td &nbsp;
+    each val, key in rows[5]
+      +td_toggle(5, key, val)
+    td &nbsp;
+  tr
+    td &nbsp;
+    td &nbsp;
+    +td_toggle(6, 'S1', rows[6].S1)
+    td &nbsp;
+    td &nbsp;
+    +td_toggle(6, 'R', rows[6].R)
+    +td_toggle(6, 'S2', rows[6].S2)
+    td &nbsp;
+  tr
+    each val, key in rows[7]
+      +td_toggle(7, key, val)
+    td#vis(colspan=5, onclick="edit_vis()")= visitor
+button(onclick="save_locals()") Save
+</div>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+<script src="https://pugjs.org/js/pug.js"></script>
+<script type="text/javascript">
+locals = {
+  day: "FRI 17",
+  turnips: 0,
+  visitor: "click to set",
+  rows: [
+    {
+      GNS: {name: 'NS', value: false}, 
+      ANS: {name: 'NS', value: false}, 
+      DNS: {name: 'NS', value: false},
+      CM: {name: 'CM', value: false}, 
+      CA: {name: 'CA', value: false}
+    },
+    {
+      R1: {name: 'R', value: false},
+      R2: {name: 'R', value: false},
+      NS: {name: 'NS', value: false},
+      GMT: {name: 'MT', value: false},
+      AMT: {name: 'MT', value: false},
+      DMT: {name: 'MT', value: false},
+      F1: {name: 'F', value: false},
+      F2: {name: 'F', value: false},
+    },
+    {
+      R3: {name: 'R', value: false},
+      R4: {name: 'R', value: false},
+      N: {name: 'N', value: false},
+      GB: {name: 'B', value: false},
+      AB: {name: 'B', value: false},
+      DB: {name: 'B', value: false},
+      F3: {name: 'F', value: false},
+      F4: {name: 'F', value: false},
+    },
+    {
+      R5: {name: 'R', value: false},
+      R6: {name: 'R', value: false},
+      A: {name: 'A', value: false},
+      GP: {name: 'P', value: false},
+      AP: {name: 'P', value: false},
+      DP: {name: 'P', value: false},
+      MP: {name: 'MP', value: false},
+      W1: {name: 'W', value: false},
+    },
+    {
+      M: {name: 'M', value: false},
+      W2: {name: 'W', value: false},
+    },
+    {
+      K: {name: 'K', value: false},
+      O: {name: 'O', value: false},
+      G: {name: 'G', value: false},
+      S: {name: 'S', value: false},
+      P: {name: 'P', value: false},
+      E: {name: 'E', value: false},
+    },
+    {
+      S1: {name: 'S', value: false},
+      R: {name: 'R', value: false},
+      S2: {name: 'S', value: false},
+    },
+    {
+      GV: {name: 'V', value: false},
+      AV: {name: 'V', value: false},
+      DV: {name: 'V', value: false},
+    }
+  ]
+}
+
+function edit_vis() {
+  ipt = pug.render("input#visin(type=text onchange=\"set_vis()\" value=visitor)", locals)
+  document.getElementById("vis").innerHTML = ipt
+}
+
+function set_vis() {
+  newval = document.getElementById('visin').value
+  locals.visitor = newval
+  render()
+}
+
+function set_tp() {
+  amt = document.getElementById('tp').value
+  locals.turnips = amt
+}
+
+function toggle(row, key) {
+  locals.rows[row][key].value =!locals.rows[row][key].value
+  render()
+}
+
+function save_locals() {
+  Cookies.set('acnh-locals', JSON.stringify(locals))
+}
+
+saved = Cookies.get('acnh-locals')
+if (saved) {
+  locals = JSON.parse(saved)
+}
+pug = require('pug')
+template = document.getElementById("source").innerHTML
+compiled = pug.compile(template)
+
+function render() {
+  rendered = compiled(locals)
+  document.getElementById("target").innerHTML = rendered
+}
+
+render()
+</script>
