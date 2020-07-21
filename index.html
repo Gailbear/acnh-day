@@ -1,5 +1,6 @@
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style type="text/css">
 .green {
   background: green;
@@ -27,6 +28,9 @@ td {
 }
 #visin {
   width: 100px;
+}
+#clr {
+  margin-top: 50px;
 }
 </style>
 </head>
@@ -71,7 +75,7 @@ table
     each val, key in rows[7]
       +td_toggle(7, key, val)
     td#vis(colspan=5, onclick="edit_vis()")= visitor
-button(onclick="save_locals()") Save
+button#clr(onclick="clear_locals()") Reset
 </div>
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
 <script src="https://pugjs.org/js/pug.js"></script>
@@ -143,6 +147,8 @@ locals = {
   ]
 }
 
+locals_blank_str = JSON.stringify(locals)
+
 function edit_vis() {
   ipt = pug.render("input#visin(type=text onchange=\"set_vis()\" value=visitor)", locals)
   document.getElementById("vis").innerHTML = ipt
@@ -152,20 +158,28 @@ function set_vis() {
   newval = document.getElementById('visin').value
   locals.visitor = newval
   render()
+  save_locals()
 }
 
 function set_tp() {
   amt = document.getElementById('tp').value
   locals.turnips = amt
+  save_locals()
 }
 
 function toggle(row, key) {
   locals.rows[row][key].value =!locals.rows[row][key].value
   render()
+  save_locals()
 }
 
 function save_locals() {
   Cookies.set('acnh-locals', JSON.stringify(locals))
+}
+
+function clear_locals() {
+  locals = JSON.parse(locals_blank_str)
+  save_locals()
 }
 
 saved = Cookies.get('acnh-locals')
