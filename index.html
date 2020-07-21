@@ -14,19 +14,14 @@
 #tp {
   width: 30px;
 }
-td[colspan=3] {
-  width: 45px;
-}
 td#vis {
   text-align: left;
   padding-left: 20px;
 }
 td {
-  width: 15px;
-  height: 15px;
   text-align: center;
 }
-#visin {
+#visitorin {
   width: 100px;
 }
 #clr {
@@ -41,7 +36,7 @@ mixin td_toggle(row, key, val)
   td(class={red: !(val.value), green: val.value}, onclick="toggle("+row+",\""+key+"\")")= val.name
 table
   tr
-    td(colspan=3)= day
+    td#day(colspan=3, onclick="edit_var('day')")= day
     each val, key in rows[0]
       +td_toggle(0, key, val)
   each r in [1,2,3]
@@ -74,14 +69,14 @@ table
   tr
     each val, key in rows[7]
       +td_toggle(7, key, val)
-    td#vis(colspan=5, onclick="edit_vis()")= visitor
+    td#visitor(colspan=5, onclick="edit_var('visitor')")= visitor
 button#clr(onclick="clear_locals()") Reset
 </div>
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
 <script src="https://pugjs.org/js/pug.js"></script>
 <script type="text/javascript">
 locals = {
-  day: "FRI 17",
+  day: "TODAY",
   turnips: 0,
   visitor: "click to set",
   rows: [
@@ -149,14 +144,14 @@ locals = {
 
 locals_blank_str = JSON.stringify(locals)
 
-function edit_vis() {
-  ipt = pug.render("input#visin(type=text onchange=\"set_vis()\" value=visitor)", locals)
-  document.getElementById("vis").innerHTML = ipt
+function edit_var(vname) {
+  ipt = pug.render("input#"+vname+"in(type=text onchange=\"set_var('"+vname+"')\" value="+vname+")", locals)
+  document.getElementById(vname).innerHTML = ipt
 }
 
-function set_vis() {
-  newval = document.getElementById('visin').value
-  locals.visitor = newval
+function set_var(vname) {
+  newval = document.getElementById(vname+'in').value
+  locals[vname] = newval
   render()
   save_locals()
 }
@@ -180,6 +175,7 @@ function save_locals() {
 function clear_locals() {
   locals = JSON.parse(locals_blank_str)
   save_locals()
+  render()
 }
 
 saved = Cookies.get('acnh-locals')
